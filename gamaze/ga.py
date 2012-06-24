@@ -1,6 +1,7 @@
 """Gamaze simulation"""
 import logging
 import random
+import cProfile
 from gamaze.Generation import Generation
 
 __author__ = 'danny'
@@ -22,7 +23,7 @@ class Simulation(object):
 
         logging.info("Creating gene builder")
         self._gb = GeneBuilder().withGeneset(self._maze.genes).withLength(8)\
-            .withMutationOnceIn(50)\
+            .withMutation(0.01)\
             .withCrossover(crossover_AAAABBBB)
 
         self._population_size = size
@@ -52,13 +53,13 @@ class Simulation(object):
         self._make_new_generation()
 
 def main():
-    random.seed()
-    logging.basicConfig(level=logging.ERROR)
-    sim = Simulation(100)
-    toStep = 20
+    random.seed(40)
+    logging.basicConfig(level=logging.WARN)
+    sim = Simulation(200)
+    toStep = 100
     for i in range(toStep):
         sim.stepGeneration()
         print ("%d-> best: %d, mean: %d" % (sim.generation, sim.best, sim.mean))
 
 if "__main__" == __name__:
-    main()
+    cProfile.run("main()")

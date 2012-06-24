@@ -1,5 +1,5 @@
 """Individual running about in the maze."""
-from random import randint, choice
+from random import randint, choice, random
 import logging
 
 __author__ = 'danny'
@@ -12,7 +12,7 @@ class GeneBuilder(object):
     ...
     >>> gb = GeneBuilder().withGeneset(genes).withLength(8)\
     ...        .withCrossover(crossover_AAAABBBB)\
-    ...        .withMutationOnceIn(10)
+    ...        .withMutation(0.1)
     >>> i1 = gb.randomIndividual()
     >>> i2 = gb.randomIndividual()
     >>> i3 = gb.fromParents(i1, i2)
@@ -55,23 +55,21 @@ class GeneBuilder(object):
         self._crossover_fn = fn
         return self
 
-    def withMutationOnceIn(self, mutation_rate):
-        """Set the mutation rate to 1 in mutation_rate"""
+    def withMutation(self, mutation_rate):
+        """Set the mutation rate to percentage of 1"""
         self._mutationRate = mutation_rate
         return self
 
     def _copyWithMutate(self, toCopy):
         """Copy with potential mutation"""
-        newGenes = []
-        logging.debug("Copying genes %s", repr(toCopy))
-        for gene in toCopy:
-            if randint(0, self._mutationRate) is 0:
-                logging.info("Mutation!")
-                newGenes += self._randomGene()
+        def copyOrMutate(gene):
+            if random() < self._mutationRate:
+                #logging.info("Mutation!")
+                return self._randomGene()
             else:
-                newGenes += gene
-        logging.debug("Output was %s", repr(newGenes))
-        return newGenes
+                return gene
+
+        return [copyOrMutate(gene) for gene in toCopy]
 
     def fromParents(self, parentA, parentB):
         """Return a new tuple of genes based on breeding the parents and potential mutation."""

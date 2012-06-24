@@ -6,10 +6,32 @@ __author__ = 'danny'
 class Individual(object):
     def __init__(self, genes):
         self.genes = genes
-        self.fitness = None
+        self.fitness = 0
 
     def __unicode__(self):
         return "%s:%d" % (repr(self.genes), self.fitness or -1)
+
+class ParentGeneration(object):
+    """Immutable version of a generation.
+    The individuals are fixed.
+    The info stays."""
+    def __init__(self, generation):
+        self._best = generation._best
+        self._population = tuple(generation._population)
+        self._size = generation._size
+        self.sumFitness = generation.sumFitness
+        self.meanFitness = generation.meanFitness
+
+    def selectParentGenes(self):
+        """Return parent genes from pool. Weighted by fitness"""
+        roulette = randint(0, self.sumFitness)
+        accum = 0
+        for i in self._population:
+            newAccum = accum + i.fitness
+            if accum <= roulette <= newAccum:
+                return i.genes
+            accum = newAccum
+        return self._population[-1:].genes
 
 class Generation(object):
     def __init__(self, size, geneBuilder):
@@ -24,17 +46,9 @@ class Generation(object):
         self._population = [Individual(self._gb.randomIndividual()) for i in range(self._size)]
         return self
 
-    def _selectMate(self):
-        roulette = randint(0, self.sumFitness)
-        accum = 0
-        for i in self._population:
-            if accum <= roulette <= i.fitness + accum:
-                return i
-            accum += i.fitness
-        return self._population[-1:]
-
     def fromPreviousGeneration(self, previous):
-        self._population = [Individual(self._gb.fromParents(previous._selectMate().genes, previous._selectMate().genes)) for i in range(self._size)]
+        parents = ParentGeneration(previous)
+        self._population = [Individual(self._gb.fromParents(parents.selectParentGenes(), parents.selectParentGenes())) for i in range(self._size)]
         self._best = previous._best
         return self
 
@@ -47,7 +61,7 @@ class Generation(object):
         for individual in self._population:
             individual.fitness = maze.testIndividual(individual.genes)
             logging.info("Tested .. Fitness was %d", individual.fitness)
-            if not self._best or (individual.fitness > self._best.fitness):
+            if self._best is None or (individual.fitness > self._best.fitness):
                 self._best = individual
 
     @property
@@ -57,7 +71,7 @@ class Generation(object):
 
     @property
     def sumFitness(self):
-        return sum([i.fitness or 0 for i in self._population])
+        return sum([i.fitness for i in self._population])
 
     @property
     def meanFitness(self):

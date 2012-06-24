@@ -24,6 +24,11 @@ class Maze(object):
             "W": self._west
         }
 
+        self._dirTable = {self._north: (self._east, self._west, self._south),
+                         self._south: (self._east, self._west, self._north),
+                         self._east: (self._north, self._south, self._west),
+                         self._west: (self._north, self._south, self._east)}
+
         self._mazeRep = ("D D D  #",
                         " # # ###",
                         " ### ## ",
@@ -32,6 +37,8 @@ class Maze(object):
                         "  # # D ",
                         "#D D # #",
                         "  ## # G")
+        self._width = 8
+        self._height = 8
 
     def withDecisionReward(self, dR):
         self._decisionReward = dR
@@ -56,7 +63,7 @@ class Maze(object):
 
     def _getCellAt(self, position):
         """Get the information for the maze at the location"""
-        return (self._mazeRep[position.y])[position.x]
+        return self._mazeRep[position.y][position.x]
 
     def _isDecisionOrRewardAt(self, position):
         """Returns true if the location is a decision point,
@@ -65,8 +72,8 @@ class Maze(object):
 
     def _isInBounds(self, position):
         """Ensure the given position is inside the maze boundaries"""
-        return ( 0 <= position.y < len(self._mazeRep) and
-                 0 <= position.x < len(self._mazeRep[position.y]))
+        return ( 0 <= position.y < self._height and
+                 0 <= position.x < self._width)
 
     def _isWallAt(self, position):
         """Return true if there is a wall at the queried position"""
@@ -81,44 +88,48 @@ class Maze(object):
 
     def _findOpening(self, position, direction):
         """Find the direction with the opening. Worst case - turn back around"""
-        dirTable = {self._north: (self._east, self._west, self._south),
-                    self._south: (self._east, self._west, self._north),
-                    self._east: (self._north, self._south, self._west),
-                    self._west: (self._north, self._south, self._east)}
-        for newdir in dirTable[direction]:
-            if not self._isWallAt(position + newdir):
-                return newdir
+        for newdir in self._dirTable[direction]:
+            newPosition = position + newdir
+            if not self._isWallAt(newPosition):
+                return newPosition, newdir
 
-    def _findNextDecision(self, position, direction):
+    def _findNextDecision(self, position, direction, _cache = {}):
         """Find a decision point based on the current position and direction.
         position: a 2-d coord Point
         direction: a 2-d direction Point
         returns: a 2-d coord Point
         """
+        orig = (hash(position), hash(direction))
+        if orig in _cache:
+            return _cache[orig]
+
         newdir = direction
         position += newdir
         while not self._isDecisionOrRewardAt(position):
             self._logMaze(position, newdir)
             newPosition = position + newdir
-            if self._isInBounds(newPosition) and not self._isWallAt(newPosition):
+            if not self._isWallAt(newPosition):
                 position = newPosition
             else:
-                newdir = self._findOpening(position, newdir)
+                position, newdir = self._findOpening(position, newdir)
+        _cache[orig] = (position, newdir)
+
         return position, newdir
 
-    def _logMaze(self, position, direction):
+    def _logMaze(self, position, direction, showLog = (logging.getLogger().level is logging.DEBUG) ):
         """Log a maze - with an X at the position given"""
-        logging.debug("**** MAZE:")
-        playerDir = {self._north: "^",
-                     self._south: ",",
-                     self._east: ">",
-                     self._west: "<"}
+        if showLog:
+            logging.debug("**** MAZE:")
+            playerDir = {self._north: "^",
+                         self._south: ",",
+                         self._east: ">",
+                         self._west: "<"}
 
-        for y, row in enumerate(self._mazeRep):
-            if position.y == y:
-                row = row[:position.x] + playerDir[direction] + row[position.x+1:]
-            logging.debug("   %s", row)
-        logging.debug("****")
+            for y, row in enumerate(self._mazeRep):
+                if position.y == y:
+                    row = row[:position.x] + playerDir[direction] + row[position.x+1:]
+                logging.debug("   %s", row)
+            logging.debug("****")
 
     def testIndividual(self, genes):
         """Given a genotype (set of NSEW genes),
