@@ -353,7 +353,8 @@ int CMaze::testIndiv(char *Genes)
 			(pos.x==0&&Genes[n]=='W')||
 			(pos.x==7&&Genes[n]=='E'))
 			//Boundary testing
-		{ fitness-=IPenalty; //Penalise(0 at mo)
+		{
+		    fitness -= IPenalty; //Penalise(0 at mo)
 		}
 		else
 		{
