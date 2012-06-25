@@ -29,7 +29,8 @@ class Maze(object):
                          self._east: (self._north, self._south, self._west),
                          self._west: (self._north, self._south, self._east)}
 
-        self._mazeRep = ("D D D  #",
+        self._mazeRep = (
+                        "D D D  #",
                         " # # ###",
                         " ### ## ",
                         "D # D  D",
@@ -144,8 +145,8 @@ class Maze(object):
             self._logMaze(position, direction)
             newPosition = position + direction
             #Penalise being out of bounds
-            if not self._isInBounds(newPosition):
-                logging.debug("Out of bounds. Fitness = %d - %d = %d", fitness, self._outOfBoundsPenalty, fitness - self._outOfBoundsPenalty)
+            if self._isWallAt(newPosition):
+                logging.debug("Oof - straight into a wall. Fitness = %d - %d = %d", fitness, self._outOfBoundsPenalty, fitness - self._outOfBoundsPenalty)
                 fitness -= self._outOfBoundsPenalty
             else:
                 #Or go to the next position
@@ -165,7 +166,7 @@ class Maze(object):
             #Reward the goal condition
             if self._isGoalAt(position):
                 logging.debug("Goal. Fitness = %d + %d = %d", fitness, self._goalReward, fitness + self._goalReward)
-                fitness += self._goalReward
+                fitness += self._goalReward / len(visitedDecisionPoints)
                 break
 
             fitness = max(0, fitness)
