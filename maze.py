@@ -1,6 +1,6 @@
 __author__ = 'danny'
 
-from gamaze.point import Point
+from point import Point
 import logging
 
 class Maze(object):

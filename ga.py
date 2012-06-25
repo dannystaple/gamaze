@@ -2,7 +2,7 @@
 import logging
 import random
 import cProfile
-from gamaze.Generation import Generation
+from Generation import Generation
 
 __author__ = 'danny'
 
