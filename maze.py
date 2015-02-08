@@ -1,5 +1,3 @@
-__author__ = 'danny'
-
 from point import Point
 import logging
 
