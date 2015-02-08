@@ -8,7 +8,7 @@ class Individual(object):
         self.genes = genes
         self.fitness = 0
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s:%d" % (repr(self.genes), self.fitness or -1)
 
 class ParentGeneration(object):
