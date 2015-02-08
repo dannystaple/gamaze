@@ -65,6 +65,10 @@ class Generation(object):
                 self._best = individual
 
     @property
+    def best(self):
+        return self._best
+
+    @property
     def bestFitness(self):
         """Get best fitness"""
         return self._best.fitness

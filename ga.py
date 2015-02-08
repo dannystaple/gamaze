@@ -7,19 +7,24 @@ from Generation import Generation
 from GeneBuilder import GeneBuilder
 from maze import Maze
 
-def crossover_AAAABBBB(parentA, parentB):
-   return parentA[0:4] + parentB[4:8]
 
-def crossover_alternate(parentA, parentB):
+def crossover_aaaabbbb(parent_a, parent_b):
+    return parent_a[0:4] + parent_b[4:8]
+
+
+def crossover_alternate(parent_a, parent_b):
     """ABABABAB crossover"""
-    return [g[i%2] for i, g in enumerate(zip(parentA, parentB))]
+    return [g[i%2] for i, g in enumerate(zip(parent_a, parent_b))]
 
-def crossover_random(parentA, parentB):
+
+def crossover_random(parent_a, parent_b):
     """random crossover"""
-    return [random.choice(g) for g in zip(parentA, parentB)]
+    return [random.choice(g) for g in zip(parent_a, parent_b)]
 
-def crossover_AABBBBBB(parentA, parentB):
-    return parentA[0:2] + parentB[2:8]
+
+def crossover_aabbbbbb(parent_a, parent_b):
+    return parent_a[0:2] + parent_b[2:8]
+
 
 class Simulation(object):
     """The overall simulation."""
@@ -51,30 +56,32 @@ class Simulation(object):
         return self._population.bestFitness
 
     @property
-    def bestGenes(self):
-        return self._population._best
+    def best_genes(self):
+        return self._population.best
 
     @property
     def mean(self):
         return self._population.meanFitness
 
-    def stepGeneration(self):
+    def step_generation(self):
         self._population = self._new_population
         logging.info("Testing..")
         self._population.test(self._maze)
         logging.info("Breeding...")
         self._make_new_generation()
 
+
 def main():
     #random.seed(40)
     random.seed()
     logging.basicConfig(level=logging.WARN)
     sim = Simulation(200)
-    toStep = 100
-    for i in range(toStep):
-        sim.stepGeneration()
+    to_step = 100
+    for i in range(to_step):
+        sim.step_generation()
         print ("%d-> best: %d, mean: %d" % (sim.generation, sim.best, sim.mean))
-    print unicode(sim.bestGenes)
+    print(str(sim.best_genes))
+
 
 if "__main__" == __name__:
     cProfile.run("main()")
