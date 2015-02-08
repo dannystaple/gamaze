@@ -1,7 +1,6 @@
 import logging
 from random import randint
 
-__author__ = 'danny'
 
 class Individual(object):
     def __init__(self, genes):
@@ -10,6 +9,7 @@ class Individual(object):
 
     def __str__(self):
         return "%s:%d" % (repr(self.genes), self.fitness or -1)
+
 
 class ParentGeneration(object):
     """Immutable version of a generation.
