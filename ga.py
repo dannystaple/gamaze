@@ -42,26 +42,26 @@ class Simulation(object):
 
         self._population_size = size
         self._population = None
-        self._new_population = Generation(self._population_size, self._gb).fromRandom()
+        self._new_population = Generation(self._population_size, self._gb).from_random()
         self._new_population.log()
 
         self.generation = 0
 
     def _make_new_generation(self):
-        self._new_population = Generation(self._population_size, self._gb).fromPreviousGeneration(self._population)
+        self._new_population = Generation(self._population_size, self._gb).from_previous_generation(self._population)
         self.generation += 1
 
     @property
     def best(self):
-        return self._population.bestFitness
+        return self._population.best_fitness
 
     @property
     def best_genes(self):
-        return self._population.best
+        return self._population.best_individual
 
     @property
     def mean(self):
-        return self._population.meanFitness
+        return self._population.mean_fitness
 
     def step_generation(self):
         self._population = self._new_population

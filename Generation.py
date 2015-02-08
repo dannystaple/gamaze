@@ -19,8 +19,8 @@ class ParentGeneration(object):
         self._best = generation._best
         self._population = tuple(generation._population)
         self._size = generation._size
-        self.sumFitness = generation.sumFitness
-        self.meanFitness = generation.meanFitness
+        self.sumFitness = generation.sum_fitness
+        self.meanFitness = generation.mean_fitness
 
     def selectParentGenes(self):
         """Return parent genes from pool. Weighted by fitness"""
@@ -34,21 +34,22 @@ class ParentGeneration(object):
         return self._population[-1:].genes
 
 class Generation(object):
-    def __init__(self, size, geneBuilder):
+    def __init__(self, size, gene_builder):
         self._best = None
         self._size = size
         self._population = []
-        self._gb = geneBuilder
+        self._gb = gene_builder
 
-    def fromRandom(self):
+    def from_random(self):
         """Populate the generation randomly"""
         logging.info("Creating random population with size %d", self._size)
         self._population = [Individual(self._gb.randomIndividual()) for i in range(self._size)]
         return self
 
-    def fromPreviousGeneration(self, previous):
+    def from_previous_generation(self, previous):
         parents = ParentGeneration(previous)
-        self._population = [Individual(self._gb.fromParents(parents.selectParentGenes(), parents.selectParentGenes())) for i in range(self._size)]
+        self._population = [Individual(self._gb.fromParents(parents.selectParentGenes(), parents.selectParentGenes()))
+                            for _ in range(self._size)]
         self._best = previous._best
         return self
 
@@ -65,19 +66,19 @@ class Generation(object):
                 self._best = individual
 
     @property
-    def best(self):
+    def best_individual(self):
         return self._best
 
     @property
-    def bestFitness(self):
+    def best_fitness(self):
         """Get best fitness"""
         return self._best.fitness
 
     @property
-    def sumFitness(self):
+    def sum_fitness(self):
         return sum([i.fitness for i in self._population])
 
     @property
-    def meanFitness(self):
+    def mean_fitness(self):
         """Get the average fitness"""
-        return self.sumFitness/self._size
+        return self.sum_fitness/self._size
