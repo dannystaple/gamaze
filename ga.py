@@ -2,10 +2,8 @@
 import logging
 import random
 import cProfile
+
 from Generation import Generation
-
-__author__ = 'danny'
-
 from GeneBuilder import GeneBuilder
 from maze import Maze
 
