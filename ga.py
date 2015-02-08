@@ -28,7 +28,7 @@ def crossover_aabbbbbb(parent_a, parent_b):
 
 class Simulation(object):
     """The overall simulation."""
-    def __init__(self, size = 100):
+    def __init__(self, size=100):
         logging.info("Creating maze environment")
         self._maze = Maze().withDecisionReward(1)\
             .withGoalReward(20)\
@@ -52,12 +52,12 @@ class Simulation(object):
         self.generation += 1
 
     @property
-    def best(self):
+    def best_fitness(self):
         return self._population.best_fitness
 
     @property
     def best_genes(self):
-        return self._population.best_individual
+        return self._population.best
 
     @property
     def mean(self):
@@ -74,14 +74,15 @@ class Simulation(object):
 def main():
     #random.seed(40)
     random.seed()
-    logging.basicConfig(level=logging.WARN)
+    logging.basicConfig(level=logging.INFO)
     sim = Simulation(200)
     to_step = 100
     for i in range(to_step):
         sim.step_generation()
-        print ("%d-> best: %d, mean: %d" % (sim.generation, sim.best, sim.mean))
+        print("%d-> best: %d, mean: %d" % (sim.generation, sim.best_fitness, sim.mean))
     print(str(sim.best_genes))
 
 
 if "__main__" == __name__:
-    cProfile.run("main()")
+    main()
+    # cProfile.run("main()")

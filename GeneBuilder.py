@@ -2,7 +2,6 @@
 from random import randint, choice, random
 import logging
 
-__author__ = 'danny'
 
 class GeneBuilder(object):
     """Build genes with this:
@@ -60,18 +59,18 @@ class GeneBuilder(object):
         self._mutationRate = mutation_rate
         return self
 
-    def _copyWithMutate(self, toCopy):
+    def _copyWithMutate(self, to_copy):
         """Copy with potential mutation"""
-        def copyOrMutate(gene):
+        def copy_or_mutate(gene):
             if random() < self._mutationRate:
                 #logging.info("Mutation!")
                 return self._randomGene()
             else:
                 return gene
 
-        return [copyOrMutate(gene) for gene in toCopy]
+        return [copy_or_mutate(gene) for gene in to_copy]
 
-    def fromParents(self, parentA, parentB):
+    def fromParents(self, parent_a, parent_b):
         """Return a new tuple of genes based on breeding the parents and potential mutation."""
-        return tuple(self._copyWithMutate(self._crossover_fn(parentA, parentB)))
+        return tuple(self._copyWithMutate(self._crossover_fn(parent_a, parent_b)))
 
